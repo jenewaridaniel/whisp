@@ -9,15 +9,14 @@ import {
   FiShield,
   FiSend,
 } from "react-icons/fi";
-
-import logo from '../assets/comp.png'; 
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import logo from "../assets/comp.png";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showNavbar, setShowNavbar] = useState(true);
 
-  // Updated navLinks with appropriate icons
   const navLinks = [
     { name: "Home", href: "/", icon: <FiHome className="text-orange-500" /> },
     {
@@ -37,7 +36,6 @@ const Navbar = () => {
     },
   ];
 
-  // Scroll detection logic
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -61,7 +59,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Main Navbar with scroll behavior */}
       <AnimatePresence>
         {showNavbar && (
           <motion.nav
@@ -73,64 +70,64 @@ const Navbar = () => {
           >
             <div className="container mx-auto px-4 py-3">
               <div className="flex justify-between items-center">
-                {/* Logo */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
                   className="flex items-center"
                 >
-                  <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                    <img src={logo} className="w-24" alt="" />
-                  </span>
+                  <Link to="/" className="text-2xl font-bold">
+                    <img src={logo} className="w-24" alt="Whisp Logo" />
+                  </Link>
                 </motion.div>
 
-                {/* Desktop Navigation */}
                 <div className="hidden md:flex items-center space-x-8">
                   {navLinks.map((link, index) => (
-                    <motion.a
+                    <motion.div
                       key={link.name}
-                      href={link.href}
-                      className="text-gray-700 hover:text-orange-500 tracking-wider transition-colors relative group flex items-center gap-1"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
                     >
-                      {/* {link.icon} */}
-                      {link.name}
-                      <motion.span
-                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-pink-500 group-hover:w-full transition-all duration-300"
-                        layoutId="navUnderline"
-                      />
-                    </motion.a>
+                      <Link
+                        to={link.href}
+                        className="text-gray-700 hover:text-orange-500 tracking-wider transition-colors relative group flex items-center gap-1"
+                      >
+                        {link.name}
+                        <motion.span
+                          className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-orange-500 to-pink-500 group-hover:w-full transition-all duration-300"
+                          layoutId="navUnderline"
+                        />
+                      </Link>
+                    </motion.div>
                   ))}
                 </div>
 
-                {/* Right Side Icons and Buttons */}
                 <div className="flex items-center space-x-4">
-                  {/* Send Button */}
-                  <motion.button
-                    className="hidden md:flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all font-bold tracking-wide relative overflow-hidden"
-                    whileHover={{
-                      scale: 1.05,
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
-                    }}
-                    whileTap={{
-                      scale: 0.98,
-                      boxShadow: "0 5px 15px -3px rgba(0, 0, 0, 0.1)",
-                    }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      transition: { delay: 0.3 },
-                    }}
-                  >
-                    <FiSend />
-                    <span>Send Anonymously</span>
-                  </motion.button>
+                  {/* Updated Send Button with Link */}
+                  <Link to="/post">
+                    <motion.button
+                      className="hidden md:flex items-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all font-bold tracking-wide relative overflow-hidden"
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
+                      }}
+                      whileTap={{
+                        scale: 0.98,
+                        boxShadow: "0 5px 15px -3px rgba(0, 0, 0, 0.1)",
+                      }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                        transition: { delay: 0.3 },
+                      }}
+                    >
+                      <FiSend />
+                      <span>Send Anonymously</span>
+                    </motion.button>
+                  </Link>
 
-                  {/* Mobile Menu Button */}
                   <motion.button
                     onClick={toggleMenu}
                     className="md:hidden p-2 text-gray-700"
@@ -146,11 +143,9 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -160,7 +155,6 @@ const Navbar = () => {
               onClick={toggleMenu}
             />
 
-            {/* Sidebar */}
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
@@ -169,11 +163,12 @@ const Navbar = () => {
               className="fixed inset-y-0 left-0 w-80 bg-white z-50 shadow-2xl"
             >
               <div className="h-full flex flex-col">
-                {/* Sidebar Header */}
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                  <span className="text-xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                    whisp
-                  </span>
+                  <Link to="/" className="text-xl font-bold">
+                    <span className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+                      whisp
+                    </span>
+                  </Link>
                   <button
                     onClick={toggleMenu}
                     className="p-2 text-gray-500 hover:text-orange-500"
@@ -182,7 +177,6 @@ const Navbar = () => {
                   </button>
                 </div>
 
-                {/* Navigation Links */}
                 <nav className="flex-1 overflow-y-auto py-4">
                   <ul className="space-y-2 px-4">
                     {navLinks.map((link, index) => (
@@ -192,35 +186,36 @@ const Navbar = () => {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
                       >
-                        <a
-                          href={link.href}
+                        <Link
+                          to={link.href}
                           className="flex items-center px-4 py-3 text-gray-700 hover:bg-orange-50 rounded-lg transition-colors"
                           onClick={toggleMenu}
                         >
                           <span className="mr-3">{link.icon}</span>
                           {link.name}
-                        </a>
+                        </Link>
                       </motion.li>
                     ))}
                   </ul>
                 </nav>
 
-                {/* Sidebar Footer */}
                 <div className="px-6 py-4 border-t border-gray-100">
-                  <motion.button
-                    className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all font-bold tracking-wide"
-                    whileHover={{
-                      scale: 1.05,
-                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
-                    }}
-                    whileTap={{
-                      scale: 0.98,
-                      boxShadow: "0 5px 15px -3px rgba(0, 0, 0, 0.1)",
-                    }}
-                  >
-                    <FiSend />
-                    <span>Send Anonymously</span>
-                  </motion.button>
+                  <Link to="/post">
+                    <motion.button
+                      className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all font-bold tracking-wide"
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.2)",
+                      }}
+                      whileTap={{
+                        scale: 0.98,
+                        boxShadow: "0 5px 15px -3px rgba(0, 0, 0, 0.1)",
+                      }}
+                    >
+                      <FiSend />
+                      <span>Send Anonymously</span>
+                    </motion.button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
