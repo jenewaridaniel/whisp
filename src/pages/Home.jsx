@@ -1,30 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import logo from '../assets/comp.png'; 
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Navigation */}
-      <nav className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <motion.h1 
-            className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            whisp
-          </motion.h1>
-          <div className="hidden md:flex space-x-6">
-            <Link to="/post" className="text-gray-600 hover:text-pink-500 transition">Post</Link>
-            <Link to="/feed" className="text-gray-600 hover:text-pink-500 transition">Feed</Link>
-          </div>
-        </div>
-      </nav>
+     
 
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-20 md:py-32">
+      <section className="container mx-auto px-6 py-20 md:py-36">
         <div className="max-w-3xl mx-auto text-center">
           <motion.h1
             className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
@@ -152,7 +138,7 @@ const Home = () => {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent mb-4 md:mb-0">
-              whisp
+            <img src={logo} className=' w-24' alt="" />
             </div>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-600 hover:text-pink-500 transition">Privacy</a>
