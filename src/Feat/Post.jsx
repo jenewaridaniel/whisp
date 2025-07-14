@@ -11,16 +11,224 @@ const Post = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [profanityDetected, setProfanityDetected] = useState(false);
+  const [detectedWords, setDetectedWords] = useState([]);
 
-  // Simple profanity filter
-  const profanityWords = [
-    "fuck",
-    "shit",
-    "asshole",
+  // Comprehensive blocked words list (alphabetical order)
+  const blockedWords = [
+    // Racial/ethnic slurs
+    "beaner",
+    "chink",
+    "coon",
+    "dindu",
+    "gook",
+    "gypsy",
+    "half-breed",
+    "hick",
+    "hillbilly",
+    "jigaboo",
+    "kike",
+    "mick",
+    "mulatto",
+    "nigger",
+    "nigga",
+    "paki",
+    "pickaninny",
+    "porch monkey",
+    "raghead",
+    "redneck",
+    "sambo",
+    "slant-eye",
+    "spic",
+    "squaw",
+    "tar baby",
+    "towelhead",
+    "tranny",
+    "wetback",
+    "white trash",
+
+    // Gender/sexual orientation slurs
     "bitch",
-    "damn",
+    "butch",
+    "dyke",
+    "fag",
+    "faggot",
+    "fairy",
+    "femme",
+    "fruit",
+    "homo",
+    "lezzie",
+    "limp wrist",
+    "non-binaryphobic",
+    "queer",
+    "shemale",
+    "sissy",
+    "tranny",
+    "twink",
+
+    // Appearance/ability slurs
+    "anorexic",
+    "autist",
+    "cripple",
+    "deafie",
+    "dumb",
+    "fatass",
+    "fatso",
+    "freak",
+    "gimp",
+    "idiot",
+    "imbecile",
+    "lardass",
+    "midget",
+    "mongoloid",
+    "moron",
+    "obese",
+    "retard",
+    "retarded",
+    "spaz",
+    "spastic",
+    "stupid",
     "ugly",
-    "fat",
+    "zitface",
+
+    // Sexual/vulgar terms
+    "anal",
+    "anus",
+    "areola",
+    "arse",
+    "arsehole",
+    "ass",
+    "asshole",
+    "ball sack",
+    "balls",
+    "bastard",
+    "bellend",
+    "bestiality",
+    "bimbo",
+    "bint",
+    "birdbrain",
+    "blow job",
+    "blowjob",
+    "bollocks",
+    "boner",
+    "boob",
+    "boobs",
+    "breast",
+    "bugger",
+    "bum",
+    "bunny boiler",
+    "butt",
+    "butthole",
+    "buttplug",
+    "clit",
+    "clitoris",
+    "cock",
+    "coon",
+    "cooter",
+    "crap",
+    "cum",
+    "cunt",
+    "dick",
+    "dickhead",
+    "dildo",
+    "dong",
+    "douche",
+    "douchebag",
+    "dumbass",
+    "ejaculate",
+    "erection",
+    "fanny",
+    "felching",
+    "fellatio",
+    "flange",
+    "fuck",
+    "fucker",
+    "fucking",
+    "genital",
+    "goddamn",
+    "god damn",
+    "gooch",
+    "handjob",
+    "hell",
+    "homo",
+    "hooker",
+    "hump",
+    "jerk",
+    "jerk-off",
+    "jizz",
+    "knob",
+    "knob end",
+    "labia",
+    "muff",
+    "naked",
+    "nazi",
+    "negro",
+    "nigga",
+    "nipple",
+    "nude",
+    "orgasm",
+    "orgy",
+    "penis",
+    "piss",
+    "pissed",
+    "pissed off",
+    "porn",
+    "porno",
+    "pornography",
+    "prick",
+    "pube",
+    "pubes",
+    "pussy",
+    "queef",
+    "rape",
+    "rapist",
+    "rectum",
+    "rimjob",
+    "schlong",
+    "scrotum",
+    "sex",
+    "shag",
+    "shemale",
+    "shit",
+    "shite",
+    "skank",
+    "slut",
+    "smegma",
+    "snatch",
+    "spunk",
+    "stripper",
+    "tard",
+    "testicle",
+    "tit",
+    "tits",
+    "titties",
+    "titty",
+    "tosser",
+    "turd",
+    "twat",
+    "vag",
+    "vagina",
+    "wank",
+    "wanker",
+    "whore",
+    "willy",
+
+    // Bullying/harmful phrases
+    "kill yourself",
+    "you should die",
+    "nobody likes you",
+    "you're worthless",
+    "you're useless",
+    "you're pathetic",
+    "you're disgusting",
+    "go die",
+    "end it all",
+    "you're a mistake",
+    "you don't belong",
+    "you're a loser",
+    "you'll never succeed",
+    "you're a failure",
+    "no one cares",
+    "you're better off dead",
   ];
 
   const categories = [
@@ -32,16 +240,60 @@ const Post = () => {
     { value: "other", label: "Other" },
   ];
 
+  // Enhanced profanity detection with leet speak and common misspellings
+  const checkForProfanity = (text) => {
+    const leetMap = {
+      a: ["4", "@", "á", "à", "â", "ã", "ä"],
+      b: ["8", "|3", "ß"],
+      e: ["3", "é", "è", "ê", "ë"],
+      g: ["6", "9"],
+      i: ["1", "!", "í", "ì", "î", "ï"],
+      l: ["1", "|", "£"],
+      o: ["0", "ó", "ò", "ô", "õ", "ö"],
+      s: ["5", "$", "§"],
+      t: ["7", "+"],
+      z: ["2"],
+    };
+
+    const lowerText = text.toLowerCase();
+    const words = lowerText.split(/\s+/);
+    const foundWords = new Set();
+
+    blockedWords.forEach((blockedWord) => {
+      // Check for exact matches
+      if (lowerText.includes(blockedWord)) {
+        foundWords.add(blockedWord);
+      }
+
+      // Check for leet speak variations
+      let pattern = blockedWord;
+      for (const [char, replacements] of Object.entries(leetMap)) {
+        if (blockedWord.includes(char)) {
+          pattern = pattern.replace(
+            new RegExp(char, "g"),
+            `[${char}${replacements.join("")}]`
+          );
+        }
+      }
+
+      const regex = new RegExp(pattern, "i");
+      if (regex.test(text)) {
+        foundWords.add(blockedWord);
+      }
+    });
+
+    return Array.from(foundWords);
+  };
+
   const handleConfessionChange = (e) => {
     const text = e.target.value;
     if (text.length <= 500) {
       setConfession(text);
 
-      // Check for profanity
-      const hasProfanity = profanityWords.some((word) =>
-        new RegExp(`\\b${word}\\b`, "i").test(text)
-      );
-      setProfanityDetected(hasProfanity);
+      // Check for profanity/bullying
+      const detected = checkForProfanity(text);
+      setDetectedWords(detected);
+      setProfanityDetected(detected.length > 0);
     }
   };
 
@@ -56,7 +308,11 @@ const Post = () => {
     }
 
     if (profanityDetected) {
-      setErrorMessage("Please remove inappropriate language");
+      setErrorMessage(
+        `Please remove inappropriate language: ${detectedWords
+          .slice(0, 3)
+          .join(", ")}${detectedWords.length > 3 ? "..." : ""}`
+      );
       setSubmitStatus("error");
       return;
     }
@@ -76,14 +332,19 @@ const Post = () => {
           hug: 0,
         },
         comments: [],
+        approved: false, // For moderation
+        reported: 0,
+        flags: [],
       });
 
-      console.log("Document written with ID: ", docRef.id);
+
 
       setIsSubmitting(false);
       setSubmitStatus("success");
       setConfession("");
       setCategory("");
+      setDetectedWords([]);
+      setProfanityDetected(false);
 
       // Reset success message after 3 seconds
       setTimeout(() => {
@@ -144,7 +405,11 @@ const Post = () => {
               <motion.textarea
                 id="confession"
                 rows={8}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition ${
+                  profanityDetected
+                    ? "border-red-300 bg-red-50"
+                    : "border-gray-300"
+                }`}
                 placeholder="Write your confession here..."
                 value={confession}
                 onChange={handleConfessionChange}
@@ -152,11 +417,26 @@ const Post = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
               />
-              <div className="flex justify-between mt-2 text-sm text-gray-500">
-                <span className={profanityDetected ? "text-red-500" : ""}>
-                  {profanityDetected ? "Inappropriate language detected" : ""}
+              <div className="flex justify-between mt-2 text-sm">
+                <span
+                  className={
+                    profanityDetected
+                      ? "text-red-600 font-medium"
+                      : "text-gray-500"
+                  }
+                >
+                  {profanityDetected ? (
+                    <>
+                      <FiAlertCircle className="inline mr-1" />
+                      {`Blocked words: ${detectedWords.slice(0, 2).join(", ")}${
+                        detectedWords.length > 2 ? "..." : ""
+                      }`}
+                    </>
+                  ) : (
+                    "Keep it respectful and kind"
+                  )}
                 </span>
-                <span>{confession.length}/500</span>
+                <span className="text-gray-500">{confession.length}/500</span>
               </div>
             </div>
 
@@ -185,10 +465,12 @@ const Post = () => {
             >
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || profanityDetected}
                 className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-full shadow-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition ${
                   isSubmitting
                     ? "bg-orange-400"
+                    : profanityDetected
+                    ? "bg-gray-400 cursor-not-allowed"
                     : "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
                 }`}
               >
@@ -260,8 +542,13 @@ const Post = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
             >
-              <p>Remember: Don't share personal information.</p>
-              <p>All confessions are completely anonymous.</p>
+              <p className="mb-1">Remember:</p>
+              <ul className="list-disc list-inside text-left mx-auto max-w-xs">
+                <li>Don't share personal information</li>
+                <li>All confessions are anonymous</li>
+                <li>Be kind to others</li>
+                <li>No bullying or hate speech</li>
+              </ul>
             </motion.div>
           </form>
         </div>
@@ -271,3 +558,4 @@ const Post = () => {
 };
 
 export default Post;
+

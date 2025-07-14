@@ -138,10 +138,10 @@ const Home = () => {
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-pink-500 to-orange-500 bg-clip-text text-transparent mb-4 md:mb-0">
-            <img src={logo} className=' w-24' alt="" />
+            <img src={logo} className=' w-36' alt="" />
             </div>
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-600 hover:text-pink-500 transition">Privacy</a>
+              <a href="/privacy" className="text-gray-600 hover:text-pink-500 transition">Privacy</a>
             </div>
           </div>
           <div className="mt-6 text-center text-gray-500 text-sm">
