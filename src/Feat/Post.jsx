@@ -236,11 +236,12 @@ const Post = () => {
     { value: "relationship", label: "Relationship" },
     { value: "school", label: "School" },
     { value: "family", label: "Family" },
+    { value: "work", label: "Work" },
     { value: "vent", label: "Vent" },
     { value: "other", label: "Other" },
   ];
 
-  // Enhanced profanity detection with leet speak and common misspellings
+  // Enhanced profanity detection with leet speak and common misspellings though never knew i could do this
   const checkForProfanity = (text) => {
     const leetMap = {
       a: ["4", "@", "á", "à", "â", "ã", "ä"],

@@ -6,6 +6,7 @@ import {
   FiHeart,
   FiShare2,
   FiBookmark,
+  FiHome,
 } from "react-icons/fi";
 import { db } from "../config/firebase";
 import confetti from "canvas-confetti";
@@ -45,6 +46,40 @@ const Feed = () => {
     { id: "rant", name: "Rants" },
     { id: "compliment", name: "Compliments" },
   ];
+
+  // Sample content for different tabs
+  const tabContent = {
+    confession: {
+      title: "Confess Your Thoughts",
+      description: "Share what's weighing on your heart anonymously",
+      icon: "🗝️",
+      emptyMessage: "No confessions yet... be the first to share!",
+    },
+    secret: {
+      title: "Your Secrets Are Safe",
+      description: "Whisper what you can't say out loud",
+      icon: "🤫",
+      emptyMessage: "No secrets shared yet... what's yours?",
+    },
+    rant: {
+      title: "Let It Out",
+      description: "Vent your frustrations anonymously",
+      icon: "😤",
+      emptyMessage: "No rants yet... got something to get off your chest?",
+    },
+    compliment: {
+      title: "Spread Kindness",
+      description: "Share positive words about someone",
+      icon: "💐",
+      emptyMessage: "No compliments yet... spread some kindness!",
+    },
+    all: {
+      title: "Whisper Wall",
+      description: "Anonymous thoughts from your community",
+      icon: "🦉",
+      emptyMessage: "The wall is quiet... be the first to share!",
+    },
+  };
 
   // Load user reactions from localStorage
   useEffect(() => {
@@ -205,6 +240,34 @@ const Feed = () => {
     }
   };
 
+  const handleShare = async (post) => {
+    try {
+      const shareData = {
+        title: "Whisper Wall Post",
+        text:
+          post.content.length > 100
+            ? `${post.content.substring(0, 100)}...`
+            : post.content,
+        url: `${window.location.origin}/post/${post.id}`,
+      };
+
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback for browsers that don't support the Web Share API
+        await navigator.clipboard.writeText(
+          `${shareData.text}\n\nRead more: ${shareData.url}`
+        );
+        alert("Link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
+      // Fallback to just copying the text
+      await navigator.clipboard.writeText(post.content);
+      alert("Post content copied to clipboard!");
+    }
+  };
+
   const filteredPosts = posts.filter((post) => {
     if (activeTab === "all") return true;
     return post.category === activeTab;
@@ -278,7 +341,10 @@ const Feed = () => {
             <span className="text-sm hidden sm:inline">Comment</span>
           </button>
 
-          <button className="flex items-center text-gray-500 hover:text-green-500 transition">
+          <button
+            onClick={() => handleShare(post)}
+            className="flex items-center text-gray-500 hover:text-green-500 transition"
+          >
             <FiShare2 className="mr-1" />
             <span className="text-sm hidden sm:inline">Share</span>
           </button>
@@ -349,6 +415,19 @@ const Feed = () => {
           </div>
         </div>
 
+        {/* Tab Header */}
+        {/* <motion.div
+          className="mb-6 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div className="text-6xl mb-4">{tabContent[activeTab].icon}</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            {tabContent[activeTab].title}
+          </h2>
+          <p className="text-gray-600">{tabContent[activeTab].description}</p>
+        </motion.div> */}
+
         {/* Posts */}
         {filteredPosts.length === 0 ? (
           <motion.div
@@ -357,17 +436,10 @@ const Feed = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="text-6xl mb-4">🦉</div>
+            <div className="text-6xl mb-4">{tabContent[activeTab].icon}</div>
             <h3 className="text-xl font-medium text-gray-800 mb-2">
-              {activeTab === "all"
-                ? "The wall is quiet..."
-                : `No ${activeTab}s yet`}
+              {tabContent[activeTab].emptyMessage}
             </h3>
-            <p className="text-gray-500">
-              {activeTab === "all"
-                ? "Be the first to share your whisper!"
-                : `Be the first to share a ${activeTab}!`}
-            </p>
             <button className="mt-6 px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full shadow-md hover:shadow-lg transition">
               Share Your Whisper
             </button>
@@ -519,19 +591,6 @@ const Feed = () => {
                                     <p className="text-gray-800 break-words">
                                       {comment.content}
                                     </p>
-                                    <div className="flex items-center mt-2 space-x-4 text-xs text-gray-500">
-                                      {/* <button className="flex items-center hover:text-pink-500">
-                                        <FiHeart size={12} className="mr-1" />
-                                        <span>12</span>
-                                      </button> */}
-                                      {/* <button className="flex items-center hover:text-blue-500">
-                                        <FiMessageSquare
-                                          size={12}
-                                          className="mr-1"
-                                        />
-                                        <span>Reply</span>
-                                      </button> */}
-                                    </div>
                                   </div>
                                 </div>
                               </motion.div>
@@ -570,8 +629,13 @@ const Feed = () => {
 
       {/* Bottom Navigation (Mobile) */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 flex justify-around sm:hidden z-10">
-        <button className="p-2 text-purple-600">
-          <FiMessageSquare size={20} />
+        <button
+          onClick={() => setActiveTab("all")}
+          className={`p-2 ${
+            activeTab === "all" ? "text-purple-600" : "text-gray-500"
+          }`}
+        >
+          <FiHome size={20} />
         </button>
         <button className="p-2 text-gray-500 hover:text-purple-600">
           <FiHeart size={20} />
@@ -580,7 +644,7 @@ const Feed = () => {
           <FiBookmark size={20} />
         </button>
         <button className="p-2 text-gray-500 hover:text-purple-600">
-          <FiShare2 size={20} />
+          <FiMessageSquare size={20} />
         </button>
       </div>
     </div>
